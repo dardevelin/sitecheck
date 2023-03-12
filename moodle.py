@@ -9,8 +9,8 @@ from time import strftime
 def getResponse(url, postData = None):
     header = { 'User-Agent' : 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0',
                 'Accept-Language': 'de',
-                'Accept-Encoding': 'utf-8'                                   
-            } 
+                'Accept-Encoding': 'utf-8'
+            }
     if(postData is not None):
         postData = urllib.parse.urlencode(postData)
     req = urllib.request.Request(url, postData, header)
@@ -37,7 +37,7 @@ class Course(Thread):
                 new = self.download(link['href'], link.span.__next__, self.CourseName)
                 for n in new:
                     self.newFiles.append(n)
-    
+
     def download(self, url, folder, CourseName):
         newFiles, savedFile = [], []
         response = getResponse(url)
@@ -58,7 +58,7 @@ class Course(Thread):
                 frames = soup.findAll(attrs={'src' : re.compile("http://moodle.uni-duisburg-essen.de/file.php")})
                 files = soup.findAll(attrs={'href' : re.compile("http://moodle.uni-duisburg-essen.de/file.php")})
                 dirs = soup.findAll(attrs={'href' : re.compile("subdir")})
-    
+
                 folder = re.sub("[^a-zA-Z0-9_()äÄöÖüÜ ]", "", folder).strip()
                 for f in files:
                     savedFile = self.saveFile(f['href'], folder)
@@ -66,7 +66,7 @@ class Course(Thread):
                         newFiles.append(savedFile)
                 # Folders
                 for d in dirs:
-                    folder = os.path.basename(d['href'])                
+                    folder = os.path.basename(d['href'])
                     href = "http://moodle.uni-duisburg-essen.de/mod/resource/" + d['href']
                     self.download(href, folder, CourseName)
                 # Frame
@@ -75,7 +75,7 @@ class Course(Thread):
                     if(len(savedFile) > 0):
                         newFiles.append(savedFile)
         return newFiles
-    
+
     def saveFile(self, url, folder = ""):
         if(folder != ""):
             folder = "/" + folder
@@ -89,7 +89,7 @@ class Course(Thread):
             if c > 5:
                 newPath = newPath + "/" + p
                 if not(os.path.isdir(self.CourseName + newPath)) and c < len(splitUrl): # len because of filename
-                    os.mkdir(self.CourseName + newPath)   
+                    os.mkdir(self.CourseName + newPath)
         fullFileName = self.CourseName + newPath
 
         response = getResponse(url)
@@ -129,7 +129,7 @@ class Course(Thread):
             return [fullFileName, url, fileChanged]
         else:
             return []
-        
+
 def finish(newFiles):
     """
     Moved from Monitor class. Sends an email containing all new files.
@@ -138,7 +138,7 @@ def finish(newFiles):
         text = ""
         subject = "Moodle Report - "
         for course in newFiles:
-	    text += "~"*5 + course + "~"*5 + "\n"
+            text += "~"*5 + course + "~"*5 + "\n"
             if(len(newFiles[course]) > 0):
                 subject += course + " "
             for file in newFiles[course]:
@@ -174,7 +174,7 @@ jar = http.cookiejar.CookieJar()
 handler = urllib.request.HTTPCookieProcessor(jar)
 opener = urllib.request.build_opener(handler)
 urllib.request.install_opener(opener)
-    
+
 # Get token
 data = getResponse(casUrl).read()
 rawstr = '<input type="hidden" name="lt" value="([A-Za-z0-9_\-]*)" />'
@@ -206,11 +206,11 @@ for link in links:
     current = Course(link['href'], CourseName)
     courses.append(current)
     current.start()
-    
+
 for course in courses:
     course.join()
     new_files_of_course = course.newFiles
     if new_files_of_course:
         newFiles[course.CourseName] = course.newFiles
-    
+
 finish(newFiles)

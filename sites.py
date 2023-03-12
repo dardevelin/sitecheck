@@ -18,11 +18,11 @@ def processSitesInFile(sitesLines):
     sites = {}
     for site in sitesLines:
         site = site.strip()
-        
-	# Ignore lines starting with # as comments
+
+        # Ignore lines starting with # as comments
         if site.startswith("#"):
             continue
-        
+
         try:
             parts = site.split("=")
             if len(parts) == 2:
@@ -31,7 +31,7 @@ def processSitesInFile(sitesLines):
                 print("Unknown site format: {0}".format(site))
         except exception as err:
             print("Error: {0}".format(err))
-            
+
     return sites
 
 def checkSite(siteDict, site):
@@ -50,7 +50,7 @@ def checkSite(siteDict, site):
     hash = url.__hash__()
     content = urllib.request.urlopen(url).read()
     prettyContent = BeautifulSoup(content).prettify()
-    
+
     if not os.path.exists(site + ".old"):
         file = open(site + ".old", "w")
         file.write(prettyContent)
@@ -58,12 +58,12 @@ def checkSite(siteDict, site):
     else:
         oldfile = site + ".old"
         newfile = site + ".new"
-        
+
         file = open(newfile, "w")
         file.write(prettyContent)
         file.close()
-        
+
         diff = os.popen("diff -uw " + oldfile + " " + newfile).read()
         shutil.move(newfile, oldfile)
-        
+
     return diff
