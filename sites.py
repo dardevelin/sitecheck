@@ -53,14 +53,14 @@ def checkSite(siteDict, site):
 
     if not os.path.exists(site + ".old"):
         file = open(site + ".old", "w")
-        file.write(prettyContent)
+        file.write(str(prettyContent))
         file.close()
     else:
         oldfile = site + ".old"
         newfile = site + ".new"
 
         file = open(newfile, "w")
-        file.write(prettyContent)
+        file.write(str(prettyContent))
         file.close()
 
         diff = os.popen("diff -uw " + oldfile + " " + newfile).read()

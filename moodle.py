@@ -124,7 +124,7 @@ class Course(Thread):
         if(isFileNew == True):
             data = response.read()
             with open(fullFileName, "w") as f:
-                f.write(data)
+                f.write(str(data))
                 f.close()
             return [fullFileName, url, fileChanged]
         else:
