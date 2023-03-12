@@ -87,15 +87,13 @@ import codecs
 import _markupbase
 import types
 import re
-from html.parser import HTMLParser, HTMLParseError
+from html.parser import HTMLParser
 try:
     from html.entities import name2codepoint
 except ImportError:
     name2codepoint = {}
-try:
-    set
-except NameError:
-    from sets import Set as set
+
+Set = set
 
 #These hacks make Beautiful Soup able to parse XML with namespaces
 _markupbase._declname_match = re.compile(r'[a-zA-Z][-_.:a-zA-Z0-9]*\s*').match
@@ -1110,7 +1108,7 @@ class HTMLParserBuilder(HTMLParser):
         else:
             try:
                 j = HTMLParser.parse_declaration(self, i)
-            except HTMLParseError:
+            except ValueError:
                 toHandle = self.rawdata[i:]
                 self.handle_data(toHandle)
                 j = i + len(toHandle)
